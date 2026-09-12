@@ -1,0 +1,536 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================
+   EDITOR X — Global Application Styles
+   ========================================================= */
+
+:root {
+  color-scheme: dark;
+
+  --editor-bg: #030712;
+  --panel-bg: #111827;
+  --panel-bg-soft: #0f172a;
+  --panel-border: #1f2937;
+
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+
+  --accent: #2563eb;
+  --accent-hover: #3b82f6;
+
+  --success: #34d399;
+  --warning: #fbbf24;
+  --error: #f87171;
+
+  --scrollbar-track: #111827;
+  --scrollbar-thumb: #374151;
+  --scrollbar-thumb-hover: #4b5563;
+
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    "Helvetica Neue",
+    sans-serif;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+html {
+  overflow: hidden;
+  background: var(--editor-bg);
+}
+
+body {
+  overflow: hidden;
+  background: var(--editor-bg);
+  color: var(--text-primary);
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  text-rendering: optimizeLegibility;
+}
+
+body,
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+button,
+input,
+textarea,
+select {
+  font-size: inherit;
+}
+
+button {
+  border: 0;
+  background: none;
+  color: inherit;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+input,
+textarea {
+  color: inherit;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #6b7280;
+  opacity: 1;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+svg,
+canvas,
+iframe {
+  display: block;
+}
+
+iframe {
+  color-scheme: light;
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family:
+    "JetBrains Mono",
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    Menlo,
+    Monaco,
+    "Courier New",
+    monospace;
+}
+
+pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* =========================================================
+   Selection
+   ========================================================= */
+
+::selection {
+  background: rgba(37, 99, 235, 0.35);
+  color: #ffffff;
+}
+
+::-moz-selection {
+  background: rgba(37, 99, 235, 0.35);
+  color: #ffffff;
+}
+
+/* =========================================================
+   Scrollbars
+   ========================================================= */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color:
+    var(--scrollbar-thumb)
+    var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 2px solid var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track);
+}
+
+/* =========================================================
+   Focus
+   ========================================================= */
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 1px solid rgba(59, 130, 246, 0.9);
+  outline-offset: 1px;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 1px solid rgba(59, 130, 246, 0.9);
+  outline-offset: 1px;
+}
+
+/* =========================================================
+   EDITOR X root layout helpers
+   ========================================================= */
+
+#root {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+/*
+ * Prevent accidental browser-level horizontal scrolling
+ * when Monaco, xterm, or preview content becomes wider
+ * than its parent.
+ */
+#root > * {
+  min-width: 0;
+  min-height: 0;
+}
+
+/* =========================================================
+   Monaco Editor
+   ========================================================= */
+
+.monaco-editor {
+  --vscode-editor-background: #030712 !important;
+}
+
+.monaco-editor,
+.monaco-editor-background,
+.monaco-editor .margin,
+.monaco-editor .monaco-scrollable-element {
+  background-color: #030712 !important;
+}
+
+.monaco-editor .overflow-guard {
+  border-radius: 0;
+}
+
+.monaco-editor .cursor {
+  transition: opacity 80ms linear;
+}
+
+.monaco-editor .scrollbar .slider {
+  border-radius: 999px;
+}
+
+.monaco-editor .suggest-widget,
+.monaco-editor .monaco-hover,
+.monaco-editor .context-view {
+  z-index: 1000 !important;
+}
+
+.monaco-editor .suggest-widget {
+  border: 1px solid #374151 !important;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.monaco-editor .monaco-hover {
+  border-radius: 6px;
+}
+
+.monaco-editor .minimap {
+  opacity: 0.85;
+}
+
+.monaco-editor .line-numbers {
+  color: #4b5563 !important;
+}
+
+.monaco-editor .current-line ~ .line-numbers {
+  color: #9ca3af !important;
+}
+
+/* =========================================================
+   Terminal / xterm
+   ========================================================= */
+
+.xterm {
+  width: 100%;
+  height: 100%;
+  padding: 8px 10px;
+  background: #000000;
+}
+
+.xterm-viewport {
+  background: #000000 !important;
+  overflow-y: auto !important;
+}
+
+.xterm-screen {
+  width: 100% !important;
+}
+
+.xterm-helper-textarea {
+  position: absolute !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.xterm .xterm-rows {
+  font-family:
+    "JetBrains Mono",
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    Menlo,
+    Monaco,
+    monospace;
+}
+
+/* =========================================================
+   Resizable panels
+   ========================================================= */
+
+[data-panel-group-direction="horizontal"] {
+  min-width: 0;
+  min-height: 0;
+}
+
+[data-panel-group-direction="vertical"] {
+  min-width: 0;
+  min-height: 0;
+}
+
+[data-panel-resize-handle-enabled="true"] {
+  transition:
+    background-color 120ms ease,
+    opacity 120ms ease;
+}
+
+[data-panel-resize-handle-enabled="true"]:hover {
+  background-color: rgba(59, 130, 246, 0.75);
+}
+
+[data-panel-resize-handle-enabled="true"]:active {
+  background-color: rgba(59, 130, 246, 1);
+}
+
+/* =========================================================
+   Explorer
+   ========================================================= */
+
+button {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+[role="tree"],
+[role="treeitem"] {
+  min-width: 0;
+}
+
+[role="treeitem"] {
+  outline: none;
+}
+
+/* =========================================================
+   Context menus / overlays
+   ========================================================= */
+
+[role="menu"] {
+  min-width: 180px;
+  max-width: 320px;
+
+  border: 1px solid #374151;
+  border-radius: 6px;
+
+  background: #1f2937;
+
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.35),
+    0 4px 10px rgba(0, 0, 0, 0.2);
+
+  overflow: hidden;
+}
+
+[role="menuitem"] {
+  min-height: 32px;
+}
+
+[role="menuitem"]:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* =========================================================
+   Form controls
+   ========================================================= */
+
+input,
+textarea,
+select {
+  background-color: #111827;
+  border-color: #374151;
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+input[type="text"],
+input[type="search"],
+input[type="url"],
+input[type="number"],
+input[type="email"],
+input[type="password"] {
+  min-width: 0;
+}
+
+/* =========================================================
+   Browser preview
+   ========================================================= */
+
+.preview-frame,
+iframe {
+  min-width: 0;
+  min-height: 0;
+}
+
+iframe {
+  background: #ffffff;
+}
+
+/* =========================================================
+   Links inside terminal output
+   ========================================================= */
+
+a[href] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* =========================================================
+   Loading / motion
+   ========================================================= */
+
+@keyframes editor-x-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.editor-x-loading {
+  animation: editor-x-pulse 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =========================================================
+   Prevent text/image dragging in IDE chrome
+   ========================================================= */
+
+.monaco-editor,
+.xterm,
+button,
+svg {
+  -webkit-user-drag: none;
+}
+
+/* =========================================================
+   Mobile / narrow viewport safety
+   ========================================================= */
+
+@media (max-width: 768px) {
+  html,
+  body,
+  #root {
+    min-width: 0;
+    min-height: 0;
+  }
+
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+/* =========================================================
+   High contrast / forced colors
+   ========================================================= */
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid CanvasText;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    forced-color-adjust: auto;
+  }
+}
