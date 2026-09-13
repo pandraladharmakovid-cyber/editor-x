@@ -17,19 +17,14 @@ import {
   FolderOpen,
   FolderTree,
   Loader2,
-  LogOut,
   MonitorPlay,
   Rocket,
   TerminalSquare,
   Upload,
-  UserCircle2,
   X,
 } from 'lucide-react';
-import type { Session } from '@supabase/supabase-js';
 import type { ChangeEvent } from 'react';
 
-import Auth from './auth/Auth';
-import { supabase } from './lib/supabase';
 import { FileTree } from './ui/FileTree';
 import { Editor } from './editor/Editor';
 import { Preview } from './preview/Preview';
@@ -229,12 +224,6 @@ function App() {
     setFileTree,
   } = useStore();
 
-  const [session, setSession] =
-    useState<Session | null>(null);
-
-  const [isCheckingAuth, setIsCheckingAuth] =
-    useState(true);
-
   const [notice, setNotice] =
     useState<Notice | null>(null);
 
@@ -242,9 +231,6 @@ function App() {
     useState(false);
 
   const [isOpeningWindow, setIsOpeningWindow] =
-    useState(false);
-
-  const [isSigningOut, setIsSigningOut] =
     useState(false);
 
   const [isFileOperationRunning, setIsFileOperationRunning] =
@@ -275,86 +261,11 @@ function App() {
   }, []);
 
   /*
-   * --------------------------------------------------------------------------
-   * Authentication
-   * --------------------------------------------------------------------------
-   */
-
-  useEffect(() => {
-    let mounted = true;
-
-    const loadSession = async (): Promise<void> => {
-      try {
-        const {
-          data,
-          error,
-        } = await supabase.auth.getSession();
-
-        if (!mounted) {
-          return;
-        }
-
-        if (error) {
-          console.error(
-            'EDITOR X: failed to restore authentication session.',
-            error,
-          );
-
-          setSession(null);
-        } else {
-          setSession(data.session);
-        }
-      } catch (error) {
-        if (!mounted) {
-          return;
-        }
-
-        console.error(
-          'EDITOR X: authentication session check failed.',
-          error,
-        );
-
-        setSession(null);
-      } finally {
-        if (mounted) {
-          setIsCheckingAuth(false);
-        }
-      }
-    };
-
-    void loadSession();
-
-    const {
-      data: {
-        subscription,
-      },
-    } = supabase.auth.onAuthStateChange(
-      (_event, nextSession) => {
-        if (!mounted) {
-          return;
-        }
-
-        setSession(nextSession);
-      },
-    );
-
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  /*
-   * The WebContainer should only start after the user is authenticated.
-   * This prevents the editor runtime from starting on the login screen.
+   * WebContainer starts directly because authentication is disabled.
    */
   useEffect(() => {
-    if (!session) {
-      return;
-    }
-
     void initializeWebContainer();
-  }, [session]);
+  }, []);
 
   /*
    * --------------------------------------------------------------------------
@@ -388,61 +299,6 @@ function App() {
     },
     [],
   );
-
-  /*
-   * --------------------------------------------------------------------------
-   * Authentication actions
-   * --------------------------------------------------------------------------
-   */
-
-  const handleAuthenticated = useCallback(() => {
-    /*
-     * The Supabase auth listener is the authoritative source for the session.
-     * This callback exists so Auth.tsx can immediately notify App after a
-     * successful authentication operation.
-     */
-    void supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-    });
-  }, []);
-
-  const handleSignOut = useCallback(async () => {
-    if (isSigningOut) {
-      return;
-    }
-
-    setIsSigningOut(true);
-
-    try {
-      const {
-        error,
-      } = await supabase.auth.signOut();
-
-      if (error) {
-        throw error;
-      }
-
-      setSession(null);
-      setNotice(null);
-    } catch (error) {
-      console.error(
-        'EDITOR X: sign out failed.',
-        error,
-      );
-
-      showNotice(
-        'error',
-        error instanceof Error
-          ? error.message
-          : 'Unable to sign out. Please try again.',
-      );
-    } finally {
-      setIsSigningOut(false);
-    }
-  }, [
-    isSigningOut,
-    showNotice,
-  ]);
 
   /*
    * --------------------------------------------------------------------------
@@ -704,44 +560,8 @@ function App() {
 
   /*
    * --------------------------------------------------------------------------
-   * Authentication loading screen
-   * --------------------------------------------------------------------------
-   */
-
-  if (isCheckingAuth) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-gray-950 text-gray-300">
-        <div className="flex items-center gap-3 text-sm">
-          <Loader2
-            size={20}
-            className="animate-spin text-blue-400"
-          />
-
-          <span>
-            Checking your EDITOR X session...
-          </span>
-        </div>
-      </div>
-    );
-  }
-
-  /*
-   * --------------------------------------------------------------------------
-   * Login / Sign-up gate
-   * --------------------------------------------------------------------------
-   */
-
-  if (!session) {
-    return (
-      <Auth
-        onAuthenticated={handleAuthenticated}
-      />
-    );
-  }
-
-  /*
-   * --------------------------------------------------------------------------
-   * Authenticated EDITOR X workspace
+   * EDITOR X workspace
+   * Authentication is disabled; the IDE opens directly.
    * --------------------------------------------------------------------------
    */
 
@@ -928,60 +748,6 @@ function App() {
             </span>
           </div>
 
-          {/* Account */}
-          <div className="hidden lg:flex items-center gap-1.5 ml-1 pl-2 border-l border-gray-800">
-            <UserCircle2
-              size={15}
-              className="text-gray-500"
-            />
-
-            <span
-              className="max-w-[180px] truncate text-[11px] text-gray-500"
-              title={session.user.email ?? 'Signed in'}
-            >
-              {session.user.email ?? 'Signed in'}
-            </span>
-          </div>
-
-          {/* Sign Out */}
-          <button
-            type="button"
-            onClick={() => {
-              void handleSignOut();
-            }}
-            disabled={isSigningOut}
-            className="
-              flex
-              items-center gap-1.5
-              h-7
-              px-2
-              sm:px-2.5
-              rounded-md
-              border border-gray-700
-              bg-gray-800
-              text-xs text-gray-400
-              transition-colors
-              hover:bg-gray-700
-              hover:text-white
-              disabled:cursor-not-allowed
-              disabled:opacity-50
-            "
-            title="Sign out of EDITOR X"
-            aria-label="Sign out of EDITOR X"
-          >
-            {isSigningOut ? (
-              <Loader2
-                size={13}
-                className="animate-spin"
-              />
-            ) : (
-              <LogOut size={13} />
-            )}
-
-            <span className="hidden sm:inline">
-              Sign Out
-            </span>
-          </button>
         </div>
       </header>
 
